@@ -350,18 +350,36 @@ body {
   margin-top:0;
   padding:12px 5px 9px;
   color:#3150bc;
-  font-size:11px;
+  font-size:12px;
+  font-weight:600;
+  line-height:1.1;
   text-align:center;
 }
 
+.timer #time {
+  display:inline-block;
+  min-width:4ch;
+  color:#0b3fa9;
+  font-size:clamp(28px, 9vw, 38px);
+  font-variant-numeric:tabular-nums;
+  font-weight:800;
+  letter-spacing:-0.04em;
+  line-height:1;
+  vertical-align:-0.12em;
+}
+
 .bar {
-  height:3px;
-  margin-top:8px;
+  height:5px;
+  margin-top:12px;
+  border-radius:999px;
+  overflow:hidden;
   background:#e2e2e2;
 }
 
 .fill {
   background:#3150bc;
+  border-radius:inherit;
+  will-change:width;
 }
 
 .qrHelp {
@@ -696,7 +714,7 @@ input {
   </div>
 
   <div class="timer">
-    남은시간 <span id="time">30</span>초
+    남은시간 <span id="time">30.0</span>초
     <div class="bar"><div class="fill" id="bar"></div></div>
   </div>
 
@@ -775,8 +793,8 @@ const timeText = document.getElementById("time");
 const bar = document.getElementById("bar");
 
 let pendingImage = null;
-let remainingSeconds = 30;
 const maxSeconds = 30;
+let timerEndsAt = performance.now() + maxSeconds * 1000;
 
 function readProfile(){
   return {
@@ -900,15 +918,17 @@ function toggleDetail(){
   detailToggle.textContent = visible ? "상세정보 숨기기" : "상세정보 표시";
 }
 
-function updateTimer(){
-  remainingSeconds--;
+function updateTimer(now){
+  let remainingMilliseconds = timerEndsAt - now;
 
-  if(remainingSeconds < 0){
-    remainingSeconds = maxSeconds;
+  if(remainingMilliseconds <= 0){
+    timerEndsAt = now + maxSeconds * 1000;
+    remainingMilliseconds = maxSeconds * 1000;
   }
 
-  timeText.textContent = remainingSeconds;
-  bar.style.width = (remainingSeconds / maxSeconds) * 100 + "%";
+  timeText.textContent = (remainingMilliseconds / 1000).toFixed(1);
+  bar.style.width = (remainingMilliseconds / (maxSeconds * 1000)) * 100 + "%";
+  requestAnimationFrame(updateTimer);
 }
 
 document.addEventListener("keydown", function(event){
@@ -917,8 +937,7 @@ document.addEventListener("keydown", function(event){
   }
 });
 
-setInterval(updateTimer, 1000);
-timeText.textContent = remainingSeconds;
+requestAnimationFrame(updateTimer);
 bar.style.width = "100%";
 renderProfile();
 
