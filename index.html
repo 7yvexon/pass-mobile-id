@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#eaf2ff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+body { margin:0; font-family:sans-serif; background:#eee; }
+
+/* 상단 */
+.header {
+  background:white;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+  position:relative;
+}
+.menu {
+  position:absolute;
+  right:10px;
+  top:12px;
+  font-size:20px;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  line-height:1;
+}
+
+/* 탭 */
+.tabs { display:flex; background:white; border-bottom:1px solid #ddd; }
+.tab { flex:1; text-align:center; padding:10px; }
+.active { border-bottom:2px solid black; font-weight:bold; }
+
+/* 카드 */
+.card { padding:20px; background:#f5f5f5; }
+
+.photo {
+  width:150px;
+  height:150px;
+  display:block;
+  margin:auto;
+  object-fit:cover;
+  background:#ccc;
+}
+
+.nameBox {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:15px;
+}
+
+.name { font-size:22px; font-weight:bold; }
+.gray { font-size:12px; color:gray; }
+
+/* QR */
+.qr img { width:100px; }
+
+/* 타이머 */
+.timer { margin-top:10px; font-size:13px; }
+.bar {
+  height:4px;
+  background:#ddd;
+  margin-top:5px;
+}
+.fill {
+  height:100%;
+  width:100%;
+  background:#3b5cff;
+}
+
+/* 바코드 */
+.barcode {
+  height:60px;
+  margin-top:20px;
+  background: repeating-linear-gradient(
+    to right,
+    black 0px,
+    black 1px,
+    white 1px,
+    white 2px,
+    black 2px,
+    black 4px,
+    white 4px,
+    white 5px,
+    black 5px,
+    black 8px,
+    white 8px,
+    white 10px,
+    black 10px,
+    black 11px,
+    white 11px,
+    white 13px
+  );
+}
+
+/* 상세정보 */
+.detail {
+  display:none;
+  margin-top:10px;
+  font-size:14px;
+  line-height:1.8;
+}
+
+.detail.is-visible {
+  display:block;
+}
+
+/* 버튼 */
+.bottom {
+  margin:20px;
+  padding:15px;
+  background:black;
+  color:white;
+  text-align:center;
+  border-radius:10px;
+  border:0;
+  width:calc(100% - 40px);
+  box-sizing:border-box;
+  font:inherit;
+  cursor:pointer;
+}
+
+/* 설정창 */
+.modal {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+  align-items:flex-start;
+  justify-content:center;
+  padding:50px 16px;
+  box-sizing:border-box;
+  overflow:auto;
+}
+.modal.is-open {
+  display:flex;
+}
+.modalContent {
+  background:white;
+  width:min(100%, 380px);
+  padding:20px;
+  box-sizing:border-box;
+  border-radius:4px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+.modalHeader {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.modalTitle {
+  margin:0;
+  font-size:20px;
+}
+
+.closeButton {
+  border:0;
+  background:transparent;
+  font-size:24px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.field {
+  display:block;
+  margin-top:12px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+input {
+  width:100%;
+  margin:6px 0 0;
+  padding:9px 10px;
+  box-sizing:border-box;
+  border:1px solid #999;
+  border-radius:2px;
+  font:inherit;
+}
+
+input[type="file"] {
+  padding:6px;
+}
+
+.selectedFile {
+  display:block;
+  margin-top:5px;
+  color:#555;
+  font-size:12px;
+  font-weight:normal;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.photoPreview {
+  display:block;
+  width:100px;
+  height:100px;
+  margin:14px auto 0;
+  object-fit:cover;
+  background:#eee;
+}
+
+.modalActions {
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:20px;
+}
+
+.modalActions button {
+  padding:8px 16px;
+  border:1px solid #777;
+  border-radius:3px;
+  background:white;
+  cursor:pointer;
+  font:inherit;
+}
+
+.modalActions .primary {
+  border-color:#111;
+  background:#111;
+  color:white;
+}
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  background:#f3f3f3;
+  color:#111;
+}
+
+.header,
+.tabs,
+.card,
+.bottom {
+  width:100%;
+  max-width:440px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.header {
+  height:48px;
+  padding:15px 18px 10px;
+  font-size:16px;
+  background:#fff;
+}
+
+.menu {
+  top:14px;
+  right:16px;
+  padding:0;
+  color:#111;
+  font-size:23px;
+}
+
+.tabs {
+  height:42px;
+  background:#fff;
+}
+
+.tab {
+  padding:12px 10px 10px;
+  color:#222;
+  font-size:14px;
+}
+
+.active {
+  border-bottom:2px solid #111;
+}
+
+.card {
+  padding:5px 16px 0;
+  background:#fff;
+}
+
+.photo {
+  width:110px;
+  height:135px;
+  margin:0 auto 16px;
+  border:1px solid #e4e4e4;
+}
+
+.nameBox {
+  align-items:center;
+  gap:16px;
+  margin-top:0;
+  padding:0 5px 14px;
+  border-bottom:1px solid #e4e4e4;
+}
+
+.nameBox > div:first-child {
+  flex:1;
+  min-width:0;
+}
+
+.gray {
+  display:none;
+}
+
+.name {
+  font-size:16px;
+  line-height:1.4;
+}
+
+.summary {
+  margin-top:2px;
+  color:#333;
+  font-size:11px;
+  line-height:1.55;
+  white-space:pre-line;
+  word-break:keep-all;
+}
+
+.qr {
+  flex:0 0 auto;
+}
+
+.qr img {
+  display:block;
+  width:78px;
+  height:78px;
+}
+
+.timer {
+  margin-top:0;
+  padding:12px 5px 9px;
+  color:#3150bc;
+  font-size:11px;
+  text-align:center;
+}
+
+.bar {
+  height:3px;
+  margin-top:8px;
+  background:#e2e2e2;
+}
+
+.fill {
+  background:#3150bc;
+}
+
+.qrHelp {
+  padding:0 5px 12px;
+  color:#999;
+  font-size:10px;
+  text-align:center;
+}
+
+.barcode {
+  display:none;
+}
+
+.detail {
+  margin-top:8px;
+  color:#555;
+  font-size:11px;
+  line-height:1.7;
+}
+
+.bottom {
+  display:block;
+  margin-top:0;
+  margin-bottom:0;
+  padding:14px 16px;
+  border-top:1px solid #e4e4e4;
+  border-radius:0;
+  background:#fff;
+  color:#aaa;
+  font-size:12px;
+}
+
+body {
+  min-height:100vh;
+  overflow-x:hidden;
+  background:linear-gradient(180deg, #eaf2ff 0%, #d7e7ff 100%);
+}
+
+.header,
+.tabs,
+.card,
+.bottom,
+.securityNotice {
+  max-width:420px;
+}
+
+.header {
+  display:flex;
+  align-items:center;
+  height:64px;
+  padding:17px 18px 12px;
+  background:transparent;
+  text-align:left;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.brandLogo {
+  display:block;
+  width:27px;
+  height:27px;
+  flex:0 0 auto;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.brandTitle {
+  overflow:hidden;
+  color:#16456f;
+  font-size:15px;
+  font-weight:600;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.menu {
+  top:19px;
+  right:17px;
+  color:#174b72;
+  font-size:27px;
+}
+
+.tabs {
+  display:none;
+}
+
+.card {
+  margin-top:7px;
+  padding:68px 28px 18px;
+  border:1px solid rgba(255,255,255,0.7);
+  border-bottom:0;
+  border-radius:24px 24px 0 0;
+  background:#f8fbff;
+  box-shadow:0 8px 24px rgba(65,100,150,0.08);
+}
+
+.photo {
+  width:180px;
+  height:240px;
+  margin:0 auto 66px;
+  border:0;
+  background:#e4eaf3;
+}
+
+.nameBox {
+  align-items:flex-start;
+  gap:18px;
+  margin:0;
+  padding:0;
+  border:0;
+}
+
+.nameBox > div:first-child {
+  padding-top:9px;
+}
+
+.name {
+  color:#07132a;
+  font-size:30px;
+  font-weight:800;
+  line-height:1.25;
+}
+
+.summary {
+  margin-top:8px;
+  color:#12213b;
+  font-size:16px;
+  font-weight:600;
+  line-height:1.6;
+}
+
+.qr img {
+  width:126px;
+  height:126px;
+}
+
+.timer {
+  margin-top:36px;
+  padding:0;
+  color:#9eafc8;
+  font-size:10px;
+}
+
+.bar {
+  height:2px;
+  margin-top:8px;
+  background:#dce7f5;
+}
+
+.fill {
+  background:#8aa9d5;
+}
+
+.qrHelp {
+  padding:13px 0 10px;
+  color:#c1cad8;
+  font-size:9px;
+}
+
+.detail {
+  margin-top:14px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#edf4ff;
+  color:#526782;
+  font-size:12px;
+}
+
+.bottom {
+  margin-top:0;
+  padding:20px 16px 21px;
+  border:0;
+  border-radius:0 0 24px 24px;
+  background:#0e59df;
+  box-shadow:0 8px 24px rgba(65,100,150,0.08);
+  color:#fff;
+  font-size:18px;
+  font-weight:600;
+}
+
+.securityNotice {
+  width:100%;
+  margin:38px auto 0;
+  padding:17px 16px;
+  border-radius:0 0 14px 14px;
+  background:linear-gradient(90deg, #59dff1 0%, #0871e8 100%);
+  box-shadow:0 8px 20px rgba(33,119,207,0.12);
+  color:#fff;
+  font-size:16px;
+  text-align:center;
+}
+
+@media (max-width:360px) {
+  .card {
+    padding:44px 20px 16px;
+  }
+
+  .photo {
+    width:150px;
+    height:200px;
+    margin-bottom:44px;
+  }
+
+  .name {
+    font-size:26px;
+  }
+
+  .summary {
+    font-size:14px;
+  }
+
+  .qr img {
+    width:104px;
+    height:104px;
+  }
+
+  .nameBox {
+    gap:12px;
+  }
+
+  .securityNotice {
+    font-size:14px;
+  }
+}
+
+html {
+  min-height:100%;
+  background:#d7e7ff;
+}
+
+button,
+input {
+  touch-action:manipulation;
+}
+
+.header {
+  width:calc(100% - 16px);
+  height:auto;
+  min-height:64px;
+  padding-top:calc(17px + env(safe-area-inset-top));
+}
+
+.menu {
+  top:calc(10px + env(safe-area-inset-top));
+  right:6px;
+  display:grid;
+  width:44px;
+  height:44px;
+  padding:0;
+  place-items:center;
+}
+
+.card,
+.bottom,
+.securityNotice {
+  width:calc(100% - 16px);
+}
+
+.card {
+  padding:clamp(44px, 14vw, 68px) clamp(20px, 7vw, 28px) 18px;
+}
+
+.photo {
+  width:min(180px, 48vw);
+  height:min(240px, 64vw);
+  margin-bottom:clamp(44px, 16vw, 66px);
+}
+
+.name {
+  font-size:clamp(24px, 7vw, 30px);
+}
+
+.summary {
+  font-size:clamp(13px, 4vw, 16px);
+}
+
+.qr img {
+  width:min(126px, 30vw);
+  height:min(126px, 30vw);
+}
+
+.bottom {
+  min-height:64px;
+}
+
+.securityNotice {
+  padding-bottom:calc(17px + env(safe-area-inset-bottom));
+}
+
+.modal {
+  padding-top:calc(16px + env(safe-area-inset-top));
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand">
+    <img class="brandLogo" src="assets/logo.png" alt="">
+    <span class="brandTitle">주민등록증 모바일 확인서비스</span>
+  </div>
+  <button class="menu" type="button" onclick="openModal()" aria-label="정보 수정" title="정보 수정">≡</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active">주민등록증</div>
+  <div class="tab">운전면허증</div>
+</div>
+
+<div class="card">
+
+  <img id="img" class="photo" src="https://via.placeholder.com/150">
+
+  <div class="nameBox">
+    <div>
+      <div class="gray">주민등록증 모바일 확인서비스</div>
+      <div class="name" id="name">홍길동</div>
+      <div id="summary" class="summary"></div>
+      <div id="detail" class="detail"></div>
+    </div>
+
+    <div class="qr">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=test">
+    </div>
+  </div>
+
+  <div class="timer">
+    남은시간 <span id="time">30</span>초
+    <div class="bar"><div class="fill" id="bar"></div></div>
+  </div>
+
+  <div class="qrHelp">QR코드를 확대하여 스캔해주세요</div>
+
+  <div class="barcode"></div>
+
+</div>
+
+<button class="bottom" id="detailToggle" type="button" onclick="toggleDetail()">확인</button>
+
+<div class="securityNotice">캡처 방지 시스템이 작동중입니다.</div>
+
+<div class="modal" id="modal" aria-hidden="true" onclick="closeModal(event)">
+  <div class="modalContent" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="event.stopPropagation()">
+    <div class="modalHeader">
+      <h2 class="modalTitle" id="modalTitle">정보 입력</h2>
+      <button class="closeButton" type="button" onclick="closeModal()" aria-label="닫기">×</button>
+    </div>
+
+    <form id="profileForm" onsubmit="apply(event)">
+      <label class="field" for="nameInput">
+        이름
+        <input id="nameInput" autocomplete="name" placeholder="이름">
+      </label>
+
+      <label class="field" for="birthInput">
+        주민등록번호
+        <input id="birthInput" inputmode="numeric" placeholder="예: 091209">
+      </label>
+
+      <label class="field" for="addrInput">
+        주소
+        <input id="addrInput" autocomplete="street-address" placeholder="주소">
+      </label>
+
+      <label class="field" for="regionInput">
+        지역
+        <input id="regionInput" placeholder="지역">
+      </label>
+
+      <label class="field" for="photoInput">
+        사진
+        <input id="photoInput" type="file" accept="image/*" onchange="changeImg(event)">
+        <span class="selectedFile" id="selectedFile">선택된 파일 없음</span>
+      </label>
+
+      <img id="photoPreview" class="photoPreview" alt="사진 미리보기" hidden>
+
+      <div class="modalActions">
+        <button type="button" onclick="closeModal()">취소</button>
+        <button class="primary" type="submit">저장</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+
+const defaultImage = "https://via.placeholder.com/150";
+const modalElement = document.getElementById("modal");
+const nameElement = document.getElementById("name");
+const imageElement = document.getElementById("img");
+const summaryElement = document.getElementById("summary");
+const detailElement = document.getElementById("detail");
+const detailToggle = document.getElementById("detailToggle");
+const nameInput = document.getElementById("nameInput");
+const birthInput = document.getElementById("birthInput");
+const addrInput = document.getElementById("addrInput");
+const regionInput = document.getElementById("regionInput");
+const photoInput = document.getElementById("photoInput");
+const photoPreview = document.getElementById("photoPreview");
+const selectedFile = document.getElementById("selectedFile");
+const timeText = document.getElementById("time");
+const bar = document.getElementById("bar");
+
+let pendingImage = null;
+let remainingSeconds = 30;
+const maxSeconds = 30;
+
+function readProfile(){
+  return {
+    name: localStorage.getItem("name") || "홍길동",
+    birth: localStorage.getItem("birth") || "",
+    addr: localStorage.getItem("addr") || "",
+    region: localStorage.getItem("region") || "",
+    image: localStorage.getItem("img") || ""
+  };
+}
+
+function openModal(){
+  const profile = readProfile();
+
+  nameInput.value = profile.name;
+  birthInput.value = profile.birth;
+  addrInput.value = profile.addr;
+  regionInput.value = profile.region;
+  photoInput.value = "";
+  pendingImage = null;
+  selectedFile.textContent = "선택된 파일 없음";
+
+  if(profile.image){
+    photoPreview.src = profile.image;
+    photoPreview.hidden = false;
+  } else {
+    photoPreview.removeAttribute("src");
+    photoPreview.hidden = true;
+  }
+
+  modalElement.classList.add("is-open");
+  modalElement.setAttribute("aria-hidden", "false");
+  nameInput.focus();
+}
+
+function closeModal(event){
+  if(event && event.target !== modalElement){
+    return;
+  }
+
+  modalElement.classList.remove("is-open");
+  modalElement.setAttribute("aria-hidden", "true");
+}
+
+function changeImg(event){
+  const file = event.target.files[0];
+
+  if(!file){
+    pendingImage = null;
+    selectedFile.textContent = "선택된 파일 없음";
+    return;
+  }
+
+  if(!file.type.startsWith("image/")){
+    alert("이미지 파일을 선택해주세요.");
+    photoInput.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(){
+    pendingImage = reader.result;
+    photoPreview.src = reader.result;
+    photoPreview.hidden = false;
+    selectedFile.textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function apply(event){
+  event.preventDefault();
+
+  localStorage.setItem("name", nameInput.value.trim() || "홍길동");
+  localStorage.setItem("birth", birthInput.value.trim());
+  localStorage.setItem("addr", addrInput.value.trim());
+  localStorage.setItem("region", regionInput.value.trim());
+
+  if(pendingImage){
+    localStorage.setItem("img", pendingImage);
+  }
+
+  renderProfile();
+  closeModal();
+}
+
+function renderProfile(){
+  const profile = readProfile();
+
+  nameElement.textContent = profile.name;
+  imageElement.src = profile.image || defaultImage;
+  summaryElement.replaceChildren();
+
+  [
+    profile.birth,
+    [profile.region, profile.addr].filter(Boolean).join(" ")
+  ].filter(Boolean).forEach(function(line){
+    const summaryLine = document.createElement("div");
+    summaryLine.textContent = line;
+    summaryElement.append(summaryLine);
+  });
+
+  detailElement.replaceChildren();
+
+  [
+    ["주민등록번호", profile.birth],
+    ["지역", profile.region],
+    ["주소", profile.addr]
+  ].forEach(function(item){
+    const row = document.createElement("div");
+    const label = document.createElement("strong");
+    label.textContent = item[0] + " ";
+    const value = document.createElement("span");
+    value.textContent = item[1] || "-";
+    row.append(label, value);
+    detailElement.append(row);
+  });
+}
+
+function toggleDetail(){
+  const visible = detailElement.classList.toggle("is-visible");
+  detailToggle.textContent = visible ? "상세정보 숨기기" : "상세정보 표시";
+}
+
+function updateTimer(){
+  remainingSeconds--;
+
+  if(remainingSeconds < 0){
+    remainingSeconds = maxSeconds;
+  }
+
+  timeText.textContent = remainingSeconds;
+  bar.style.width = (remainingSeconds / maxSeconds) * 100 + "%";
+}
+
+document.addEventListener("keydown", function(event){
+  if(event.key === "Escape" && modalElement.classList.contains("is-open")){
+    closeModal();
+  }
+});
+
+setInterval(updateTimer, 1000);
+timeText.textContent = remainingSeconds;
+bar.style.width = "100%";
+renderProfile();
+
+</script>
+
+</body>
+</html>
