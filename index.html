@@ -526,8 +526,9 @@ body {
 .timer {
   margin-top:36px;
   padding:0;
-  color:#9eafc8;
+  color:#111;
   font-size:10px;
+  font-weight:600;
 }
 
 .bar {
@@ -950,7 +951,7 @@ renderProfile();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function(){
-    navigator.serviceWorker.register("sw.js?v=6");
+    navigator.serviceWorker.register("sw.js?v=7");
   });
 }
 
