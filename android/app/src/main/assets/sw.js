@@ -1,9 +1,11 @@
-const CACHE_NAME = "pass-mobile-id-v4";
+const CACHE_NAME = "pass-mobile-id-v5";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./assets/logo.png", "./assets/default-photo.svg", "./assets/qr.png"];
 
 self.addEventListener("install", function(event){
   event.waitUntil(caches.open(CACHE_NAME).then(function(cache){
     return cache.addAll(APP_SHELL);
+  }).then(function(){
+    return self.skipWaiting();
   }));
 });
 
@@ -14,7 +16,9 @@ self.addEventListener("activate", function(event){
         return key !== CACHE_NAME;
       }).map(function(key){
         return caches.delete(key);
-      }));
+      })).then(function(){
+        return self.clients.claim();
+      });
     })
   );
 });
