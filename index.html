@@ -714,7 +714,7 @@ input {
   </div>
 
   <div class="timer">
-    남은시간 <span id="time">30.0</span>초
+    남은시간 <span id="time">30</span>초
     <div class="bar"><div class="fill" id="bar"></div></div>
   </div>
 
@@ -926,7 +926,7 @@ function updateTimer(now){
     remainingMilliseconds = maxSeconds * 1000;
   }
 
-  timeText.textContent = (remainingMilliseconds / 1000).toFixed(1);
+  timeText.textContent = Math.ceil(remainingMilliseconds / 1000);
   bar.style.width = (remainingMilliseconds / (maxSeconds * 1000)) * 100 + "%";
   requestAnimationFrame(updateTimer);
 }

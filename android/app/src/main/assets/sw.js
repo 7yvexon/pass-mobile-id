@@ -1,4 +1,4 @@
-const CACHE_NAME = "pass-mobile-id-v2";
+const CACHE_NAME = "pass-mobile-id-v3";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./assets/logo.png", "./assets/default-photo.svg", "./assets/qr.png"];
 
 self.addEventListener("install", function(event){
