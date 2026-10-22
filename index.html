@@ -349,9 +349,9 @@ body {
 .timer {
   margin-top:0;
   padding:12px 5px 9px;
-  color:#3150bc;
-  font-size:12px;
-  font-weight:600;
+  color:#111;
+  font-size:14px;
+  font-weight:700;
   line-height:1.1;
   text-align:center;
 }
@@ -359,8 +359,8 @@ body {
 .timer #time {
   display:inline-block;
   min-width:4ch;
-  color:#0b3fa9;
-  font-size:clamp(28px, 9vw, 38px);
+  color:#111;
+  font-size:clamp(30px, 9vw, 40px);
   font-variant-numeric:tabular-nums;
   font-weight:800;
   letter-spacing:-0.04em;
@@ -379,7 +379,14 @@ body {
 .fill {
   background:#3150bc;
   border-radius:inherit;
-  will-change:width;
+  animation:timerDrain 30s linear forwards;
+  transform-origin:left center;
+  will-change:transform;
+}
+
+@keyframes timerDrain {
+  from { transform:scaleX(1); }
+  to { transform:scaleX(0); }
 }
 
 .qrHelp {
@@ -793,8 +800,8 @@ const timeText = document.getElementById("time");
 const bar = document.getElementById("bar");
 
 let pendingImage = null;
+let remainingSeconds = 30;
 const maxSeconds = 30;
-let timerEndsAt = performance.now() + maxSeconds * 1000;
 
 function readProfile(){
   return {
@@ -918,17 +925,21 @@ function toggleDetail(){
   detailToggle.textContent = visible ? "상세정보 숨기기" : "상세정보 표시";
 }
 
-function updateTimer(now){
-  let remainingMilliseconds = timerEndsAt - now;
+function restartTimerBar(){
+  bar.style.animation = "none";
+  void bar.offsetWidth;
+  bar.style.animation = "timerDrain " + maxSeconds + "s linear forwards";
+}
 
-  if(remainingMilliseconds <= 0){
-    timerEndsAt = now + maxSeconds * 1000;
-    remainingMilliseconds = maxSeconds * 1000;
+function updateTimer(){
+  remainingSeconds--;
+
+  if(remainingSeconds < 0){
+    remainingSeconds = maxSeconds;
+    restartTimerBar();
   }
 
-  timeText.textContent = Math.ceil(remainingMilliseconds / 1000);
-  bar.style.width = (remainingMilliseconds / (maxSeconds * 1000)) * 100 + "%";
-  requestAnimationFrame(updateTimer);
+  timeText.textContent = remainingSeconds;
 }
 
 document.addEventListener("keydown", function(event){
@@ -937,8 +948,9 @@ document.addEventListener("keydown", function(event){
   }
 });
 
-requestAnimationFrame(updateTimer);
-bar.style.width = "100%";
+setInterval(updateTimer, 1000);
+timeText.textContent = remainingSeconds;
+restartTimerBar();
 renderProfile();
 
 if ("serviceWorker" in navigator) {
