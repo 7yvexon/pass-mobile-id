@@ -6,6 +6,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/logo.png">
 <style>
 body { margin:0; font-family:sans-serif; background:#eee; }
 
@@ -231,6 +233,15 @@ input[type="file"] {
   border-color:#111;
   background:#111;
   color:white;
+}
+
+.downloadLink {
+  display:inline-flex;
+  align-items:center;
+  margin-right:auto;
+  color:#0e59df;
+  font-size:12px;
+  text-decoration:none;
 }
 
 * {
@@ -736,6 +747,7 @@ input {
       <img id="photoPreview" class="photoPreview" alt="사진 미리보기" hidden>
 
       <div class="modalActions">
+        <a class="downloadLink" href="https://7yvexon.github.io/pass-mobile-id/downloads/pass-mobile-id-debug.apk">앱 다운로드</a>
         <button type="button" onclick="closeModal()">취소</button>
         <button class="primary" type="submit">저장</button>
       </div>
@@ -909,6 +921,12 @@ setInterval(updateTimer, 1000);
 timeText.textContent = remainingSeconds;
 bar.style.width = "100%";
 renderProfile();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js");
+  });
+}
 
 </script>
 

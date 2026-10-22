@@ -1,0 +1,17 @@
+{
+  "name": "모바일 신분증",
+  "short_name": "모바일 신분증",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#d7e7ff",
+  "theme_color": "#eaf2ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/logo.png",
+      "sizes": "720x720",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
